@@ -3,44 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="IG Post">
-    <link rel="manifest" href="manifest.json">
     <title>Minimal IG Post Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', sans-serif;
             background: #F5F5F5;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #000;
-        }
-        
+
+        .container { max-width: 600px; margin: 0 auto; }
+
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #000; }
+
         .controls {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             font-size: 14px;
@@ -48,7 +31,7 @@
             margin-bottom: 8px;
             color: #333;
         }
-        
+
         textarea {
             width: 100%;
             min-height: 120px;
@@ -60,14 +43,10 @@
             resize: vertical;
             margin-bottom: 16px;
         }
-        
-        .size-controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .size-btn {
+
+        .btn-row { display: flex; gap: 12px; margin-bottom: 16px; }
+
+        .control-btn {
             flex: 1;
             padding: 10px;
             background: #fff;
@@ -78,55 +57,13 @@
             cursor: pointer;
             transition: all 150ms;
         }
-        
-        .size-btn.active {
+
+        .control-btn.active {
             background: #000;
             color: #fff;
             border-color: #000;
         }
-        
-        .weight-controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .weight-btn {
-            flex: 1;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 150ms;
-        }
-        
-        .weight-btn.active {
-            background: #000;
-            color: #fff;
-            border-color: #000;
-        }
-        
-        .align-btn {
-            flex: 1;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 150ms;
-        }
-        
-        .align-btn.active {
-            background: #000;
-            color: #fff;
-            border-color: #000;
-        }
-        
+
         .download-btn {
             width: 100%;
             padding: 14px;
@@ -139,20 +76,13 @@
             font-weight: 600;
             cursor: pointer;
         }
-        
-        .preview-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        
-        .preview-label {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: #333;
-        }
-        
+
+        .download-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .preview-container { background: #fff; padding: 20px; border-radius: 8px; }
+
+        .preview-label { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: #333; }
+
         #canvas {
             width: 100%;
             border: 1px solid #ddd;
@@ -161,49 +91,45 @@
             -webkit-user-select: none;
             user-select: none;
         }
-        
-        .info {
-            margin-top: 12px;
-            font-size: 12px;
-            color: #666;
-        }
+
+        .info { margin-top: 12px; font-size: 12px; color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Minimal IG Post Generator</h1>
-        
+
         <div class="controls">
             <label>Text</label>
             <textarea id="textInput" placeholder="Type your text here...">I build AI automation systems,
 content pipelines,
 and decision tools.</textarea>
-            
+
             <label>Size</label>
-            <div class="size-controls">
-                <button class="size-btn" data-size="42">Small</button>
-                <button class="size-btn active" data-size="52">Medium</button>
-                <button class="size-btn" data-size="62">Large</button>
+            <div class="btn-row">
+                <button class="control-btn" data-size="42">Small</button>
+                <button class="control-btn active" data-size="52">Medium</button>
+                <button class="control-btn" data-size="62">Large</button>
             </div>
-            
+
             <label>Weight</label>
-            <div class="weight-controls">
-                <button class="weight-btn" data-weight="400">Regular</button>
-                <button class="weight-btn active" data-weight="500">Medium</button>
-                <button class="weight-btn" data-weight="600">Semibold</button>
+            <div class="btn-row">
+                <button class="control-btn" data-weight="400">Regular</button>
+                <button class="control-btn active" data-weight="500">Medium</button>
+                <button class="control-btn" data-weight="600">Semibold</button>
             </div>
-            
+
             <label>Alignment</label>
-            <div class="weight-controls">
-                <button class="align-btn" data-align="left">Left</button>
-                <button class="align-btn active" data-align="center">Center</button>
-                <button class="align-btn" data-align="right">Right</button>
+            <div class="btn-row">
+                <button class="control-btn" data-align="left">Left</button>
+                <button class="control-btn active" data-align="center">Center</button>
+                <button class="control-btn" data-align="right">Right</button>
             </div>
-            
-            <button class="download-btn" id="downloadBtn">Download (1080x1080)</button>
-            <button class="download-btn" id="shareBtn" style="background: #333; margin-top: 12px;">Share / Save Image</button>
+
+            <button class="download-btn" id="downloadBtn" disabled>Download (1080×1080)</button>
+            <button class="download-btn" id="shareBtn" style="background:#333;margin-top:12px;" disabled>Share / Save Image</button>
         </div>
-        
+
         <div class="preview-container">
             <div class="preview-label">Preview</div>
             <canvas id="canvas" width="1080" height="1080"></canvas>
@@ -212,160 +138,179 @@ and decision tools.</textarea>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const textInput = document.getElementById('textInput');
+        const CANVAS_SIZE = 1080;
+        const PADDING     = 120;
+        const LINE_HEIGHT_RATIO = 1.4;
+
+        const canvas      = document.getElementById('canvas');
+        const ctx         = canvas.getContext('2d');
+        const textInput   = document.getElementById('textInput');
         const downloadBtn = document.getElementById('downloadBtn');
-        const shareBtn = document.getElementById('shareBtn');
-        
-        let fontSize = 52;
+        const shareBtn    = document.getElementById('shareBtn');
+
+        let fontSize   = 52;
         let fontWeight = 500;
-        let textAlign = 'center';
-        
-        // Load Inter font
-        const font = new FontFace('Inter', 'url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2)');
-        font.load().then(() => {
-            document.fonts.add(font);
+        let textAlign  = 'center';
+        let fontLoaded = false;
+
+        // Single FontFace load — doubles as the CSS font for UI elements too
+        const interFont = new FontFace(
+            'Inter',
+            'url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2)'
+        );
+        interFont.load().then(f => {
+            document.fonts.add(f);
+            fontLoaded = true;
+            downloadBtn.disabled = false;
+            shareBtn.disabled    = false;
+            drawCanvas();
+        }).catch(() => {
+            // Proceed with system fallback
+            fontLoaded = true;
+            downloadBtn.disabled = false;
+            shareBtn.disabled    = false;
             drawCanvas();
         });
-        
+
+        // RAF-debounced redraw — avoids thrashing on every keystroke
+        let rafId = null;
+        function scheduleRedraw() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => { rafId = null; drawCanvas(); });
+        }
+
+        // Wraps text and truncates individual words that exceed maxWidth
         function wrapText(text, maxWidth) {
             const words = text.split(' ');
             const lines = [];
             let currentLine = '';
-            
-            words.forEach(word => {
-                const testLine = currentLine + (currentLine ? ' ' : '') + word;
-                const metrics = ctx.measureText(testLine);
-                
-                if (metrics.width > maxWidth && currentLine) {
+
+            for (const word of words) {
+                // Word alone is wider than the canvas — truncate with ellipsis
+                if (ctx.measureText(word).width > maxWidth) {
+                    if (currentLine) { lines.push(currentLine); currentLine = ''; }
+                    let clipped = word;
+                    while (clipped.length > 1 && ctx.measureText(clipped + '…').width > maxWidth) {
+                        clipped = clipped.slice(0, -1);
+                    }
+                    lines.push(clipped + '…');
+                    continue;
+                }
+
+                const candidate = currentLine ? currentLine + ' ' + word : word;
+                if (ctx.measureText(candidate).width > maxWidth && currentLine) {
                     lines.push(currentLine);
                     currentLine = word;
                 } else {
-                    currentLine = testLine;
+                    currentLine = candidate;
                 }
-            });
-            
-            if (currentLine) {
-                lines.push(currentLine);
             }
-            
+
+            if (currentLine) lines.push(currentLine);
             return lines;
         }
-        
+
         function drawCanvas() {
-            // Clear canvas
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, 1080, 1080);
-            
-            // Set text style
-            ctx.fillStyle = '#000000';
-            ctx.font = `${fontWeight} ${fontSize}px Inter`;
-            ctx.textAlign = textAlign;
+            ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+            ctx.fillStyle    = '#000000';
+            ctx.font         = `${fontWeight} ${fontSize}px Inter, sans-serif`;
+            ctx.textAlign    = textAlign;
             ctx.textBaseline = 'middle';
-            
-            // Calculate max width based on alignment
-            const padding = 120;
-            const maxWidth = 1080 - (padding * 2);
-            
-            // Split text by manual line breaks, then wrap long lines
-            const text = textInput.value;
-            const paragraphs = text.split('\n');
-            const allLines = [];
-            
-            paragraphs.forEach(paragraph => {
+
+            const maxWidth  = CANVAS_SIZE - PADDING * 2;
+            const allLines  = [];
+
+            for (const paragraph of textInput.value.split('\n')) {
                 if (paragraph.trim() === '') {
                     allLines.push('');
                 } else {
-                    const wrapped = wrapText(paragraph, maxWidth);
-                    allLines.push(...wrapped);
+                    allLines.push(...wrapText(paragraph, maxWidth));
                 }
-            });
-            
-            const lineHeight = fontSize * 1.4;
+            }
+
+            const lineHeight  = fontSize * LINE_HEIGHT_RATIO;
             const totalHeight = allLines.length * lineHeight;
-            const startY = (1080 - totalHeight) / 2 + lineHeight / 2;
-            
-            // Set X position based on alignment
-            let x = 540; // center default
-            if (textAlign === 'left') x = padding;
-            if (textAlign === 'right') x = 1080 - padding;
-            
-            allLines.forEach((line, i) => {
-                ctx.fillText(line, x, startY + i * lineHeight);
+            const startY      = (CANVAS_SIZE - totalHeight) / 2 + lineHeight / 2;
+
+            const x = textAlign === 'left'  ? PADDING :
+                      textAlign === 'right' ? CANVAS_SIZE - PADDING :
+                      CANVAS_SIZE / 2;
+
+            allLines.forEach((line, i) => ctx.fillText(line, x, startY + i * lineHeight));
+        }
+
+        function getCanvasBlob() {
+            return new Promise((resolve, reject) => {
+                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob returned null')), 'image/png');
             });
         }
-        
-        // Event listeners
-        textInput.addEventListener('input', drawCanvas);
-        
-        document.querySelectorAll('.size-btn').forEach(btn => {
+
+        function triggerDownload(blob, filename) {
+            const url  = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href     = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                triggerDownload(await getCanvasBlob(), 'ig-post.png');
+            } catch (err) {
+                console.error('Download failed:', err);
+                alert('Download failed. Please try again.');
+            }
+        });
+
+        shareBtn.addEventListener('click', async () => {
+            try {
+                const blob = await getCanvasBlob();
+                const file = new File([blob], 'ig-post.png', { type: 'image/png' });
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: 'IG Post' });
+                } else {
+                    triggerDownload(blob, 'ig-post.png');
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Share failed:', err);
+                }
+            }
+        });
+
+        textInput.addEventListener('input', () => { if (fontLoaded) scheduleRedraw(); });
+
+        document.querySelectorAll('[data-size]').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                fontSize = parseInt(btn.dataset.size);
+                fontSize = parseInt(btn.dataset.size, 10);
                 drawCanvas();
             });
         });
-        
-        document.querySelectorAll('.weight-btn').forEach(btn => {
+
+        document.querySelectorAll('[data-weight]').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.weight-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('[data-weight]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                fontWeight = parseInt(btn.dataset.weight);
+                fontWeight = parseInt(btn.dataset.weight, 10);
                 drawCanvas();
             });
         });
-        
-        document.querySelectorAll('.align-btn').forEach(btn => {
+
+        document.querySelectorAll('[data-align]').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('[data-align]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 textAlign = btn.dataset.align;
                 drawCanvas();
             });
         });
-        
-        downloadBtn.addEventListener('click', () => {
-            // Convert canvas to blob for better mobile compatibility
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.download = 'ig-post.png';
-                link.href = url;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }, 'image/png');
-        });
-        
-        shareBtn.addEventListener('click', async () => {
-            try {
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                const file = new File([blob], 'ig-post.png', { type: 'image/png' });
-                
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'IG Post'
-                    });
-                } else {
-                    // Fallback: open in new window for manual save
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, '_blank');
-                }
-            } catch (err) {
-                console.log('Share failed:', err);
-            }
-        });
-        
-        // Register service worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log('Service worker registration failed:', err);
-            });
-        }
     </script>
 </body>
 </html>
