@@ -11,18 +11,50 @@
             font-family: 'Inter', sans-serif;
             background: #F5F5F5;
             padding: 20px;
+            transition: background 200ms, color 200ms;
+        }
+
+        body.dark {
+            background: #111;
+            color: #fff;
         }
 
         .container { max-width: 600px; margin: 0 auto; }
 
-        h1 { font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #000; }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 24px; font-weight: 600; color: #000; }
+        body.dark h1 { color: #fff; }
+
+        #themeToggle {
+            padding: 8px 14px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 150ms;
+        }
+        body.dark #themeToggle {
+            background: #222;
+            border-color: #444;
+            color: #fff;
+        }
 
         .controls {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
+            transition: background 200ms;
         }
+        body.dark .controls { background: #1e1e1e; }
 
         label {
             display: block;
@@ -31,6 +63,7 @@
             margin-bottom: 8px;
             color: #333;
         }
+        body.dark label { color: #aaa; }
 
         textarea {
             width: 100%;
@@ -42,6 +75,12 @@
             border-radius: 4px;
             resize: vertical;
             margin-bottom: 16px;
+            transition: background 200ms, color 200ms, border-color 200ms;
+        }
+        body.dark textarea {
+            background: #2a2a2a;
+            color: #fff;
+            border-color: #444;
         }
 
         .btn-row { display: flex; gap: 12px; margin-bottom: 16px; }
@@ -57,31 +96,71 @@
             cursor: pointer;
             transition: all 150ms;
         }
+        body.dark .control-btn {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #ccc;
+        }
 
         .control-btn.active {
             background: #000;
             color: #fff;
             border-color: #000;
         }
+        body.dark .control-btn.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .action-row { display: flex; gap: 12px; margin-top: 4px; }
 
         .download-btn {
-            width: 100%;
+            flex: 1;
             padding: 14px;
             background: #000;
             color: #fff;
             border: none;
             border-radius: 4px;
             font-family: 'Inter', sans-serif;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            transition: background 150ms;
         }
+        body.dark .download-btn { background: #fff; color: #000; }
+        .download-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .download-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #copyLinkBtn {
+            padding: 14px 18px;
+            background: #fff;
+            color: #000;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 150ms;
+            white-space: nowrap;
+        }
+        body.dark #copyLinkBtn {
+            background: #2a2a2a;
+            color: #fff;
+            border-color: #444;
+        }
+        #copyLinkBtn.copied { background: #000; color: #fff; border-color: #000; }
+        body.dark #copyLinkBtn.copied { background: #fff; color: #000; border-color: #fff; }
 
-        .preview-container { background: #fff; padding: 20px; border-radius: 8px; }
+        .preview-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            transition: background 200ms;
+        }
+        body.dark .preview-container { background: #1e1e1e; }
 
         .preview-label { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: #333; }
+        body.dark .preview-label { color: #aaa; }
 
         #canvas {
             width: 100%;
@@ -91,19 +170,21 @@
             -webkit-user-select: none;
             user-select: none;
         }
+        body.dark #canvas { border-color: #444; }
 
         .info { margin-top: 12px; font-size: 12px; color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Minimal IG Post Generator</h1>
+        <div class="header">
+            <h1>Minimal IG Post</h1>
+            <button id="themeToggle">☀️ Light</button>
+        </div>
 
         <div class="controls">
             <label>Text</label>
-            <textarea id="textInput" placeholder="Type your text here...">I build AI automation systems,
-content pipelines,
-and decision tools.</textarea>
+            <textarea id="textInput" placeholder="Escribí tu texto acá..."></textarea>
 
             <label>Size</label>
             <div class="btn-row">
@@ -126,34 +207,87 @@ and decision tools.</textarea>
                 <button class="control-btn" data-align="right">Right</button>
             </div>
 
-            <button class="download-btn" id="downloadBtn" disabled>Download (1080×1080)</button>
-            <button class="download-btn" id="shareBtn" style="background:#333;margin-top:12px;" disabled>Share / Save Image</button>
+            <div class="action-row">
+                <button class="download-btn" id="downloadBtn" disabled>Download 1080×1080</button>
+                <button id="copyLinkBtn">🔗 Copiar link</button>
+            </div>
         </div>
 
         <div class="preview-container">
             <div class="preview-label">Preview</div>
             <canvas id="canvas" width="1080" height="1080"></canvas>
-            <div class="info">White background, black text. Tap-hold image to save on mobile.</div>
+            <div class="info">Tap-hold en mobile para guardar la imagen.</div>
         </div>
     </div>
 
     <script>
-        const CANVAS_SIZE = 1080;
-        const PADDING     = 120;
+        const CANVAS_SIZE       = 1080;
+        const PADDING           = 120;
         const LINE_HEIGHT_RATIO = 1.4;
+        const STORAGE_KEY       = 'igpost_text';
 
         const canvas      = document.getElementById('canvas');
         const ctx         = canvas.getContext('2d');
         const textInput   = document.getElementById('textInput');
         const downloadBtn = document.getElementById('downloadBtn');
-        const shareBtn    = document.getElementById('shareBtn');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const themeToggle = document.getElementById('themeToggle');
 
         let fontSize   = 52;
         let fontWeight = 500;
         let textAlign  = 'center';
         let fontLoaded = false;
+        let darkMode   = false;
 
-        // Single FontFace load — doubles as the CSS font for UI elements too
+        // ── Theme ────────────────────────────────────────────────────────────
+        function applyTheme(dark) {
+            darkMode = dark;
+            document.body.classList.toggle('dark', dark);
+            themeToggle.textContent = dark ? '☀️ Light' : '🌙 Dark';
+            if (fontLoaded) drawCanvas();
+        }
+
+        themeToggle.addEventListener('click', () => applyTheme(!darkMode));
+
+        // ── Restore text from URL param, then localStorage ───────────────────
+        const urlText = new URLSearchParams(location.search).get('t');
+        if (urlText) {
+            textInput.value = urlText;
+        } else {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) textInput.value = saved;
+            } catch {}
+        }
+
+        // Default placeholder if still empty
+        if (!textInput.value) {
+            textInput.value = 'I build AI automation systems,\ncontent pipelines,\nand decision tools.';
+        }
+
+        // ── Save to localStorage on every keystroke ──────────────────────────
+        textInput.addEventListener('input', () => {
+            try { localStorage.setItem(STORAGE_KEY, textInput.value); } catch {}
+            if (fontLoaded) scheduleRedraw();
+        });
+
+        // ── Copy shareable link ──────────────────────────────────────────────
+        copyLinkBtn.addEventListener('click', () => {
+            const url = new URL(location.href);
+            url.searchParams.set('t', textInput.value);
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                copyLinkBtn.textContent = '✅ Copiado';
+                copyLinkBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyLinkBtn.textContent = '🔗 Copiar link';
+                    copyLinkBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                prompt('Copiá el link:', url.toString());
+            });
+        });
+
+        // ── Font ─────────────────────────────────────────────────────────────
         const interFont = new FontFace(
             'Inter',
             'url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2)'
@@ -162,31 +296,27 @@ and decision tools.</textarea>
             document.fonts.add(f);
             fontLoaded = true;
             downloadBtn.disabled = false;
-            shareBtn.disabled    = false;
             drawCanvas();
         }).catch(() => {
-            // Proceed with system fallback
             fontLoaded = true;
             downloadBtn.disabled = false;
-            shareBtn.disabled    = false;
             drawCanvas();
         });
 
-        // RAF-debounced redraw — avoids thrashing on every keystroke
+        // ── RAF debounce ──────────────────────────────────────────────────────
         let rafId = null;
         function scheduleRedraw() {
             if (rafId) cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(() => { rafId = null; drawCanvas(); });
         }
 
-        // Wraps text and truncates individual words that exceed maxWidth
+        // ── Canvas drawing ────────────────────────────────────────────────────
         function wrapText(text, maxWidth) {
             const words = text.split(' ');
             const lines = [];
             let currentLine = '';
 
             for (const word of words) {
-                // Word alone is wider than the canvas — truncate with ellipsis
                 if (ctx.measureText(word).width > maxWidth) {
                     if (currentLine) { lines.push(currentLine); currentLine = ''; }
                     let clipped = word;
@@ -196,7 +326,6 @@ and decision tools.</textarea>
                     lines.push(clipped + '…');
                     continue;
                 }
-
                 const candidate = currentLine ? currentLine + ' ' + word : word;
                 if (ctx.measureText(candidate).width > maxWidth && currentLine) {
                     lines.push(currentLine);
@@ -205,22 +334,24 @@ and decision tools.</textarea>
                     currentLine = candidate;
                 }
             }
-
             if (currentLine) lines.push(currentLine);
             return lines;
         }
 
         function drawCanvas() {
-            ctx.fillStyle = '#FFFFFF';
+            const bg   = darkMode ? '#000000' : '#FFFFFF';
+            const fg   = darkMode ? '#FFFFFF' : '#000000';
+
+            ctx.fillStyle = bg;
             ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-            ctx.fillStyle    = '#000000';
+            ctx.fillStyle    = fg;
             ctx.font         = `${fontWeight} ${fontSize}px Inter, sans-serif`;
             ctx.textAlign    = textAlign;
             ctx.textBaseline = 'middle';
 
-            const maxWidth  = CANVAS_SIZE - PADDING * 2;
-            const allLines  = [];
+            const maxWidth = CANVAS_SIZE - PADDING * 2;
+            const allLines = [];
 
             for (const paragraph of textInput.value.split('\n')) {
                 if (paragraph.trim() === '') {
@@ -241,9 +372,10 @@ and decision tools.</textarea>
             allLines.forEach((line, i) => ctx.fillText(line, x, startY + i * lineHeight));
         }
 
+        // ── Download / Share ──────────────────────────────────────────────────
         function getCanvasBlob() {
             return new Promise((resolve, reject) => {
-                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob returned null')), 'image/png');
+                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob null')), 'image/png');
             });
         }
 
@@ -260,15 +392,6 @@ and decision tools.</textarea>
 
         downloadBtn.addEventListener('click', async () => {
             try {
-                triggerDownload(await getCanvasBlob(), 'ig-post.png');
-            } catch (err) {
-                console.error('Download failed:', err);
-                alert('Download failed. Please try again.');
-            }
-        });
-
-        shareBtn.addEventListener('click', async () => {
-            try {
                 const blob = await getCanvasBlob();
                 const file = new File([blob], 'ig-post.png', { type: 'image/png' });
                 if (navigator.share && navigator.canShare({ files: [file] })) {
@@ -278,13 +401,13 @@ and decision tools.</textarea>
                 }
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    console.error('Share failed:', err);
+                    console.error('Download failed:', err);
+                    alert('No se pudo descargar. Intentá de nuevo.');
                 }
             }
         });
 
-        textInput.addEventListener('input', () => { if (fontLoaded) scheduleRedraw(); });
-
+        // ── Button groups ─────────────────────────────────────────────────────
         document.querySelectorAll('[data-size]').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
