@@ -1,439 +1,522 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimal IG Post Generator</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>posteo</title>
+  <style>
+    :root {
+      --bg:        #EBEBEB;
+      --surface:   #F8F8F8;
+      --border:    #DEDEDE;
+      --text:      #111111;
+      --muted:     #909090;
+      --btn-bg:    #F0F0F0;
+      --active:    #111111;
+      --active-fg: #F8F8F8;
+      --shadow:    0 0 0 1px rgba(0,0,0,.06), 0 6px 24px rgba(0,0,0,.07);
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #F5F5F5;
-            padding: 20px;
-            transition: background 200ms, color 200ms;
-        }
+    [data-theme="dark"] {
+      --bg:        #0D0D0D;
+      --surface:   #161616;
+      --border:    #2A2A2A;
+      --text:      #EEEEEE;
+      --muted:     #606060;
+      --btn-bg:    #1F1F1F;
+      --active:    #EEEEEE;
+      --active-fg: #111111;
+      --shadow:    0 0 0 1px rgba(255,255,255,.04), 0 6px 24px rgba(0,0,0,.5);
+    }
 
-        body.dark {
-            background: #111;
-            color: #fff;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
 
-        .container { max-width: 600px; margin: 0 auto; }
+    body {
+      font-family: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      transition: background .25s, color .25s;
+    }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
+    /* ── Header ──────────────────────────────────── */
+    header {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+      transition: background .25s, border-color .25s;
+    }
 
-        h1 { font-size: 24px; font-weight: 600; color: #000; }
-        body.dark h1 { color: #fff; }
+    .logo {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
 
-        #themeToggle {
-            padding: 8px 14px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            background: #fff;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 150ms;
-        }
-        body.dark #themeToggle {
-            background: #222;
-            border-color: #444;
-            color: #fff;
-        }
+    .theme-pill {
+      all: unset;
+      cursor: pointer;
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      letter-spacing: 0.04em;
+      transition: color .15s, border-color .15s;
+    }
+    .theme-pill:hover { color: var(--text); border-color: var(--muted); }
 
-        .controls {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            transition: background 200ms;
-        }
-        body.dark .controls { background: #1e1e1e; }
+    /* ── Layout ──────────────────────────────────── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 0;
+    }
 
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        body.dark label { color: #aaa; }
+    /* ── Left panel ──────────────────────────────── */
+    .panel-left {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      transition: background .25s, border-color .25s;
+    }
 
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            margin-bottom: 16px;
-            transition: background 200ms, color 200ms, border-color 200ms;
-        }
-        body.dark textarea {
-            background: #2a2a2a;
-            color: #fff;
-            border-color: #444;
-        }
+    .ctrl-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      transition: border-color .25s;
+    }
 
-        .btn-row { display: flex; gap: 12px; margin-bottom: 16px; }
+    .ctrl-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
 
-        .control-btn {
-            flex: 1;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 150ms;
-        }
-        body.dark .control-btn {
-            background: #2a2a2a;
-            border-color: #444;
-            color: #ccc;
-        }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 11px 12px;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      resize: none;
+      transition: border-color .15s, background .25s, color .25s;
+    }
+    textarea::placeholder { color: var(--muted); }
+    textarea:focus { outline: none; border-color: var(--muted); }
 
-        .control-btn.active {
-            background: #000;
-            color: #fff;
-            border-color: #000;
-        }
-        body.dark .control-btn.active {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-        }
+    .seg-group {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
 
-        .action-row { display: flex; gap: 12px; margin-top: 4px; }
+    .seg-btn {
+      all: unset;
+      cursor: pointer;
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--btn-bg);
+      letter-spacing: 0.02em;
+      transition: color .1s, border-color .1s, background .1s;
+      white-space: nowrap;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      background: var(--active);
+      color: var(--active-fg);
+      border-color: var(--active);
+    }
 
-        .download-btn {
-            flex: 1;
-            padding: 14px;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 150ms;
-        }
-        body.dark .download-btn { background: #fff; color: #000; }
-        .download-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    /* ── Actions ─────────────────────────────────── */
+    .actions {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
 
-        #copyLinkBtn {
-            padding: 14px 18px;
-            background: #fff;
-            color: #000;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 150ms;
-            white-space: nowrap;
-        }
-        body.dark #copyLinkBtn {
-            background: #2a2a2a;
-            color: #fff;
-            border-color: #444;
-        }
-        #copyLinkBtn.copied { background: #000; color: #fff; border-color: #000; }
-        body.dark #copyLinkBtn.copied { background: #fff; color: #000; border-color: #fff; }
+    .btn-dl {
+      all: unset;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      padding: 10px;
+      background: var(--active);
+      color: var(--active-fg);
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border-radius: 6px;
+      transition: opacity .15s, background .25s, color .25s;
+    }
+    .btn-dl:hover { opacity: .78; }
+    .btn-dl:disabled { opacity: .22; cursor: not-allowed; }
 
-        .preview-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            transition: background 200ms;
-        }
-        body.dark .preview-container { background: #1e1e1e; }
+    .btn-link {
+      all: unset;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      padding: 9px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      border-radius: 6px;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .btn-link:hover { color: var(--text); border-color: var(--muted); }
+    .btn-link.copied {
+      background: var(--active);
+      color: var(--active-fg);
+      border-color: var(--active);
+    }
 
-        .preview-label { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: #333; }
-        body.dark .preview-label { color: #aaa; }
+    /* ── Right panel ─────────────────────────────── */
+    .panel-right {
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      transition: background .25s;
+    }
 
-        #canvas {
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            pointer-events: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        body.dark #canvas { border-color: #444; }
+    .canvas-wrap {
+      width: 100%;
+      max-width: min(520px, 100%);
+    }
 
-        .info { margin-top: 12px; font-size: 12px; color: #666; }
-    </style>
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      transition: box-shadow .25s;
+    }
+
+    /* ── Mobile ──────────────────────────────────── */
+    @media (max-width: 767px) {
+      main {
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+      .panel-left { border-right: none; }
+      .panel-right {
+        padding: 20px 16px 32px;
+        border-top: 1px solid var(--border);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Minimal IG Post</h1>
-            <button id="themeToggle">☀️ Light</button>
-        </div>
 
-        <div class="controls">
-            <label>Text</label>
-            <textarea id="textInput" placeholder="Escribí tu texto acá..."></textarea>
+<header>
+  <span class="logo">posteo</span>
+  <button class="theme-pill" id="themeBtn">dark</button>
+</header>
 
-            <label>Size</label>
-            <div class="btn-row">
-                <button class="control-btn" data-size="42">Small</button>
-                <button class="control-btn active" data-size="52">Medium</button>
-                <button class="control-btn" data-size="62">Large</button>
-            </div>
+<main>
+  <div class="panel-left">
 
-            <label>Weight</label>
-            <div class="btn-row">
-                <button class="control-btn" data-weight="400">Regular</button>
-                <button class="control-btn active" data-weight="500">Medium</button>
-                <button class="control-btn" data-weight="600">Semibold</button>
-            </div>
-
-            <label>Alignment</label>
-            <div class="btn-row">
-                <button class="control-btn" data-align="left">Left</button>
-                <button class="control-btn active" data-align="center">Center</button>
-                <button class="control-btn" data-align="right">Right</button>
-            </div>
-
-            <div class="action-row">
-                <button class="download-btn" id="downloadBtn" disabled>Download 1080×1080</button>
-                <button id="copyLinkBtn">🔗 Copiar link</button>
-            </div>
-        </div>
-
-        <div class="preview-container">
-            <div class="preview-label">Preview</div>
-            <canvas id="canvas" width="1080" height="1080"></canvas>
-            <div class="info">Tap-hold en mobile para guardar la imagen.</div>
-        </div>
+    <div class="ctrl-section">
+      <div class="ctrl-label">Text</div>
+      <textarea id="textInput" placeholder="Escribí tu texto..."></textarea>
     </div>
 
-    <script>
-        const CANVAS_SIZE       = 1080;
-        const PADDING           = 120;
-        const LINE_HEIGHT_RATIO = 1.4;
-        const STORAGE_KEY       = 'igpost_text';
+    <div class="ctrl-section">
+      <div class="ctrl-label">Size</div>
+      <div class="seg-group">
+        <button class="seg-btn" data-size="42">S</button>
+        <button class="seg-btn active" data-size="52">M</button>
+        <button class="seg-btn" data-size="62">L</button>
+      </div>
+    </div>
 
-        const canvas      = document.getElementById('canvas');
-        const ctx         = canvas.getContext('2d');
-        const textInput   = document.getElementById('textInput');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const copyLinkBtn = document.getElementById('copyLinkBtn');
-        const themeToggle = document.getElementById('themeToggle');
+    <div class="ctrl-section">
+      <div class="ctrl-label">Weight</div>
+      <div class="seg-group">
+        <button class="seg-btn" data-weight="400">Regular</button>
+        <button class="seg-btn active" data-weight="500">Medium</button>
+        <button class="seg-btn" data-weight="600">Semibold</button>
+      </div>
+    </div>
 
-        let fontSize   = 52;
-        let fontWeight = 500;
-        let textAlign  = 'center';
-        let fontLoaded = false;
-        let darkMode   = false;
+    <div class="ctrl-section">
+      <div class="ctrl-label">Align</div>
+      <div class="seg-group">
+        <button class="seg-btn" data-align="left">Left</button>
+        <button class="seg-btn active" data-align="center">Center</button>
+        <button class="seg-btn" data-align="right">Right</button>
+      </div>
+    </div>
 
-        // ── Theme ────────────────────────────────────────────────────────────
-        function applyTheme(dark) {
-            darkMode = dark;
-            document.body.classList.toggle('dark', dark);
-            themeToggle.textContent = dark ? '☀️ Light' : '🌙 Dark';
-            if (fontLoaded) drawCanvas();
+    <div class="actions">
+      <button class="btn-dl" id="downloadBtn" disabled>Download 1080 x 1080</button>
+      <button class="btn-link" id="copyLinkBtn">Copy link</button>
+    </div>
+
+  </div>
+
+  <div class="panel-right">
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="1080" height="1080"></canvas>
+    </div>
+  </div>
+</main>
+
+<script>
+  const CANVAS_SIZE       = 1080;
+  const PADDING           = 120;
+  const LINE_HEIGHT_RATIO = 1.4;
+  const STORAGE_KEY       = 'posteo_text';
+
+  const canvas      = document.getElementById('canvas');
+  const ctx         = canvas.getContext('2d');
+  const textInput   = document.getElementById('textInput');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  const themeBtn    = document.getElementById('themeBtn');
+  const root        = document.documentElement;
+
+  let fontSize   = 52;
+  let fontWeight = 500;
+  let textAlign  = 'center';
+  let fontLoaded = false;
+  let darkMode   = false;
+
+  // ── Theme ──────────────────────────────────────────
+  function setTheme(dark) {
+    darkMode = dark;
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    themeBtn.textContent = dark ? 'light' : 'dark';
+    if (fontLoaded) drawCanvas();
+  }
+
+  themeBtn.addEventListener('click', () => setTheme(!darkMode));
+
+  // ── Restore text ───────────────────────────────────
+  const urlText = new URLSearchParams(location.search).get('t');
+  if (urlText) {
+    textInput.value = urlText;
+  } else {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) textInput.value = saved;
+    } catch {}
+  }
+  if (!textInput.value) {
+    textInput.value = 'I build AI automation systems,\ncontent pipelines,\nand decision tools.';
+  }
+
+  // ── Persist text ────────────────────────────────────
+  textInput.addEventListener('input', () => {
+    try { localStorage.setItem(STORAGE_KEY, textInput.value); } catch {}
+    if (fontLoaded) scheduleRedraw();
+  });
+
+  // ── Copy link ───────────────────────────────────────
+  copyLinkBtn.addEventListener('click', () => {
+    const url = new URL(location.href);
+    url.searchParams.set('t', textInput.value);
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      copyLinkBtn.textContent = 'Copied!';
+      copyLinkBtn.classList.add('copied');
+      setTimeout(() => {
+        copyLinkBtn.textContent = 'Copy link';
+        copyLinkBtn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      prompt('Copy this link:', url.toString());
+    });
+  });
+
+  // ── Font ────────────────────────────────────────────
+  const interFont = new FontFace(
+    'Inter',
+    'url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2)'
+  );
+  interFont.load().then(f => {
+    document.fonts.add(f);
+    fontLoaded = true;
+    downloadBtn.disabled = false;
+    drawCanvas();
+  }).catch(() => {
+    fontLoaded = true;
+    downloadBtn.disabled = false;
+    drawCanvas();
+  });
+
+  // ── RAF debounce ────────────────────────────────────
+  let rafId = null;
+  function scheduleRedraw() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => { rafId = null; drawCanvas(); });
+  }
+
+  // ── Canvas ──────────────────────────────────────────
+  function wrapText(text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let cur = '';
+
+    for (const word of words) {
+      if (ctx.measureText(word).width > maxWidth) {
+        if (cur) { lines.push(cur); cur = ''; }
+        let clipped = word;
+        while (clipped.length > 1 && ctx.measureText(clipped + '…').width > maxWidth) {
+          clipped = clipped.slice(0, -1);
         }
+        lines.push(clipped + '…');
+        continue;
+      }
+      const candidate = cur ? cur + ' ' + word : word;
+      if (ctx.measureText(candidate).width > maxWidth && cur) {
+        lines.push(cur);
+        cur = word;
+      } else {
+        cur = candidate;
+      }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
 
-        themeToggle.addEventListener('click', () => applyTheme(!darkMode));
+  function drawCanvas() {
+    const bg = darkMode ? '#000000' : '#FFFFFF';
+    const fg = darkMode ? '#FFFFFF' : '#000000';
 
-        // ── Restore text from URL param, then localStorage ───────────────────
-        const urlText = new URLSearchParams(location.search).get('t');
-        if (urlText) {
-            textInput.value = urlText;
-        } else {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) textInput.value = saved;
-            } catch {}
-        }
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-        // Default placeholder if still empty
-        if (!textInput.value) {
-            textInput.value = 'I build AI automation systems,\ncontent pipelines,\nand decision tools.';
-        }
+    ctx.fillStyle    = fg;
+    ctx.font         = `${fontWeight} ${fontSize}px Inter, sans-serif`;
+    ctx.textAlign    = textAlign;
+    ctx.textBaseline = 'middle';
 
-        // ── Save to localStorage on every keystroke ──────────────────────────
-        textInput.addEventListener('input', () => {
-            try { localStorage.setItem(STORAGE_KEY, textInput.value); } catch {}
-            if (fontLoaded) scheduleRedraw();
-        });
+    const maxWidth = CANVAS_SIZE - PADDING * 2;
+    const allLines = [];
 
-        // ── Copy shareable link ──────────────────────────────────────────────
-        copyLinkBtn.addEventListener('click', () => {
-            const url = new URL(location.href);
-            url.searchParams.set('t', textInput.value);
-            navigator.clipboard.writeText(url.toString()).then(() => {
-                copyLinkBtn.textContent = '✅ Copiado';
-                copyLinkBtn.classList.add('copied');
-                setTimeout(() => {
-                    copyLinkBtn.textContent = '🔗 Copiar link';
-                    copyLinkBtn.classList.remove('copied');
-                }, 2000);
-            }).catch(() => {
-                prompt('Copiá el link:', url.toString());
-            });
-        });
+    for (const para of textInput.value.split('\n')) {
+      if (para.trim() === '') { allLines.push(''); }
+      else { allLines.push(...wrapText(para, maxWidth)); }
+    }
 
-        // ── Font ─────────────────────────────────────────────────────────────
-        const interFont = new FontFace(
-            'Inter',
-            'url(https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2)'
-        );
-        interFont.load().then(f => {
-            document.fonts.add(f);
-            fontLoaded = true;
-            downloadBtn.disabled = false;
-            drawCanvas();
-        }).catch(() => {
-            fontLoaded = true;
-            downloadBtn.disabled = false;
-            drawCanvas();
-        });
+    const lineHeight  = fontSize * LINE_HEIGHT_RATIO;
+    const totalHeight = allLines.length * lineHeight;
+    const startY      = (CANVAS_SIZE - totalHeight) / 2 + lineHeight / 2;
+    const x = textAlign === 'left'  ? PADDING :
+               textAlign === 'right' ? CANVAS_SIZE - PADDING :
+               CANVAS_SIZE / 2;
 
-        // ── RAF debounce ──────────────────────────────────────────────────────
-        let rafId = null;
-        function scheduleRedraw() {
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => { rafId = null; drawCanvas(); });
-        }
+    allLines.forEach((line, i) => ctx.fillText(line, x, startY + i * lineHeight));
+  }
 
-        // ── Canvas drawing ────────────────────────────────────────────────────
-        function wrapText(text, maxWidth) {
-            const words = text.split(' ');
-            const lines = [];
-            let currentLine = '';
+  // ── Blob / download ─────────────────────────────────
+  function getBlob() {
+    return new Promise((res, rej) =>
+      canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob null')), 'image/png')
+    );
+  }
 
-            for (const word of words) {
-                if (ctx.measureText(word).width > maxWidth) {
-                    if (currentLine) { lines.push(currentLine); currentLine = ''; }
-                    let clipped = word;
-                    while (clipped.length > 1 && ctx.measureText(clipped + '…').width > maxWidth) {
-                        clipped = clipped.slice(0, -1);
-                    }
-                    lines.push(clipped + '…');
-                    continue;
-                }
-                const candidate = currentLine ? currentLine + ' ' + word : word;
-                if (ctx.measureText(candidate).width > maxWidth && currentLine) {
-                    lines.push(currentLine);
-                    currentLine = word;
-                } else {
-                    currentLine = candidate;
-                }
-            }
-            if (currentLine) lines.push(currentLine);
-            return lines;
-        }
+  function triggerDownload(blob, name) {
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.download = name;
+    a.href     = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
-        function drawCanvas() {
-            const bg   = darkMode ? '#000000' : '#FFFFFF';
-            const fg   = darkMode ? '#FFFFFF' : '#000000';
+  downloadBtn.addEventListener('click', async () => {
+    try {
+      const blob = await getBlob();
+      const file = new File([blob], 'posteo.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'posteo' });
+      } else {
+        triggerDownload(blob, 'posteo.png');
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        console.error(e);
+        alert('No se pudo descargar. Intentá de nuevo.');
+      }
+    }
+  });
 
-            ctx.fillStyle = bg;
-            ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  // ── Control groups ──────────────────────────────────
+  function bindGroup(selector, key, parse, redraw) {
+    document.querySelectorAll(selector).forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(selector).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (parse === 'int') fontSize   = parseInt(btn.dataset[key], 10);
+        else if (key === 'weight')  fontWeight = parseInt(btn.dataset.weight, 10);
+        else if (key === 'align')   textAlign  = btn.dataset.align;
+        if (redraw) drawCanvas();
+      });
+    });
+  }
 
-            ctx.fillStyle    = fg;
-            ctx.font         = `${fontWeight} ${fontSize}px Inter, sans-serif`;
-            ctx.textAlign    = textAlign;
-            ctx.textBaseline = 'middle';
+  document.querySelectorAll('[data-size]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      fontSize = parseInt(btn.dataset.size, 10);
+      drawCanvas();
+    });
+  });
 
-            const maxWidth = CANVAS_SIZE - PADDING * 2;
-            const allLines = [];
+  document.querySelectorAll('[data-weight]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-weight]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      fontWeight = parseInt(btn.dataset.weight, 10);
+      drawCanvas();
+    });
+  });
 
-            for (const paragraph of textInput.value.split('\n')) {
-                if (paragraph.trim() === '') {
-                    allLines.push('');
-                } else {
-                    allLines.push(...wrapText(paragraph, maxWidth));
-                }
-            }
-
-            const lineHeight  = fontSize * LINE_HEIGHT_RATIO;
-            const totalHeight = allLines.length * lineHeight;
-            const startY      = (CANVAS_SIZE - totalHeight) / 2 + lineHeight / 2;
-
-            const x = textAlign === 'left'  ? PADDING :
-                      textAlign === 'right' ? CANVAS_SIZE - PADDING :
-                      CANVAS_SIZE / 2;
-
-            allLines.forEach((line, i) => ctx.fillText(line, x, startY + i * lineHeight));
-        }
-
-        // ── Download / Share ──────────────────────────────────────────────────
-        function getCanvasBlob() {
-            return new Promise((resolve, reject) => {
-                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob null')), 'image/png');
-            });
-        }
-
-        function triggerDownload(blob, filename) {
-            const url  = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href     = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        downloadBtn.addEventListener('click', async () => {
-            try {
-                const blob = await getCanvasBlob();
-                const file = new File([blob], 'ig-post.png', { type: 'image/png' });
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'IG Post' });
-                } else {
-                    triggerDownload(blob, 'ig-post.png');
-                }
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error('Download failed:', err);
-                    alert('No se pudo descargar. Intentá de nuevo.');
-                }
-            }
-        });
-
-        // ── Button groups ─────────────────────────────────────────────────────
-        document.querySelectorAll('[data-size]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                fontSize = parseInt(btn.dataset.size, 10);
-                drawCanvas();
-            });
-        });
-
-        document.querySelectorAll('[data-weight]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('[data-weight]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                fontWeight = parseInt(btn.dataset.weight, 10);
-                drawCanvas();
-            });
-        });
-
-        document.querySelectorAll('[data-align]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('[data-align]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                textAlign = btn.dataset.align;
-                drawCanvas();
-            });
-        });
-    </script>
+  document.querySelectorAll('[data-align]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-align]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      textAlign = btn.dataset.align;
+      drawCanvas();
+    });
+  });
+</script>
 </body>
 </html>
